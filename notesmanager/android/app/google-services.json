@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "663608846570",
+    "project_id": "notesmanager",
+    "storage_bucket": "notesmanager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663608846570:android:528bb0afd591e21ac00f93",
+        "android_client_info": {
+          "package_name": "com.decryptcode.notesmanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb54EM_0WgDwb2UTu5GrtpBj1aVOFc9LQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
