@@ -66,12 +66,21 @@ class _LoginViewState extends State<LoginView> {
                                   email: email, password: password);
                           print(userCreditential);
                         } on FirebaseAuthException catch (e) {
+                          print(e.code);
                           final error = e.code;
                           print('Error $error');
                         }
                       },
                       child: const Text('Login'),
                     ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/register/',
+                            (route) => false,
+                          );
+                        },
+                        child: Text('Not register yet? Register here!')),
                   ],
                 );
               default:
