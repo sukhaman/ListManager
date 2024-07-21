@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomeView(),
+      home: const LoginView(),
     );
   }
 }
@@ -38,12 +38,36 @@ class HomeView extends StatelessWidget {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                print(FirebaseAuth.instance.currentUser);
-                return const Text('Done');
+                final currentUser = FirebaseAuth.instance.currentUser;
+                print(currentUser);
+                if (currentUser?.emailVerified ?? false) {
+                  return const Text('Done');
+                } else {
+                  return const VerifyEmailView();
+                }
               default:
                 return const Text('Loading...');
             }
           }),
+    );
+  }
+}
+
+class VerifyEmailView extends StatelessWidget {
+  const VerifyEmailView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text('Please verify your email address'),
+        TextButton(
+            onPressed: () async {
+              final user = FirebaseAuth.instance.currentUser;
+              await user?.sendEmailVerification();
+            },
+            child: const Text('Send email verification'))
+      ],
     );
   }
 }
