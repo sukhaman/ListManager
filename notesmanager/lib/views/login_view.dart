@@ -5,8 +5,10 @@ import 'package:notesmanager/constans/routes.dart';
 import 'package:notesmanager/firebase_options.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:notesmanager/utilities/show_error_dialog.dart';
+
 class LoginView extends StatefulWidget {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -47,43 +49,48 @@ class _LoginViewState extends State<LoginView> {
                       enableSuggestions: false,
                       autocorrect: false,
                       keyboardType: TextInputType.emailAddress,
-                      decoration:
-                          InputDecoration(hintText: 'Enter your email here'),
+                      decoration: const InputDecoration(
+                          hintText: 'Enter your email here'),
                     ),
                     TextField(
                       controller: _password,
                       enableSuggestions: false,
                       autocorrect: false,
                       obscureText: true,
-                      decoration:
-                          InputDecoration(hintText: 'Enter your password here'),
+                      decoration: const InputDecoration(
+                          hintText: 'Enter your password here'),
                     ),
                     TextButton(
                       onPressed: () async {
                         final email = _email.text;
                         final password = _password.text;
                         try {
+                          // ignore: unused_local_variable
                           final userCreditential = await FirebaseAuth.instance
                               .signInWithEmailAndPassword(
                                   email: email, password: password);
+                          // ignore: use_build_context_synchronously
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               homeRoute, (route) => false);
                         } on FirebaseAuthException catch (e) {
-                          devtools.log(e.code);
-                          final error = e.code;
-                          devtools.log(error.toString());
+                          await showErrorDialog(
+                            // ignore: use_build_context_synchronously
+                            context,
+                            e.code,
+                          );
                         }
                       },
                       child: const Text('Login'),
                     ),
                     TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            registerRoute,
-                            (route) => false,
-                          );
-                        },
-                        child: Text('Not register yet? Register here!')),
+                      onPressed: () {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          registerRoute,
+                          (route) => false,
+                        );
+                      },
+                      child: const Text('Not register yet? Register here!'),
+                    ),
                   ],
                 );
               default:
