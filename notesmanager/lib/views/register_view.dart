@@ -40,23 +40,32 @@ class _RegisterViewState extends State<RegisterView> {
             enableSuggestions: false,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(hintText: 'Enter your email here'),
+            decoration:
+                const InputDecoration(hintText: 'Enter your email here'),
           ),
           TextField(
             controller: _password,
             enableSuggestions: false,
             autocorrect: false,
             obscureText: true,
-            decoration: InputDecoration(hintText: 'Enter your password here'),
+            decoration:
+                const InputDecoration(hintText: 'Enter your password here'),
           ),
           TextButton(
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
-              final userCreditential = await FirebaseAuth.instance
-                  .createUserWithEmailAndPassword(
-                      email: email, password: password);
-              print(userCreditential);
+              await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  email: email, password: password);
+              final user = FirebaseAuth.instance.currentUser;
+              await user?.sendEmailVerification();
+              if (user?.emailVerified ?? false) {
+                // Email is verified
+                Navigator.of(context).pushNamed(homeRoute);
+              } else {
+                // Email is not verified
+                Navigator.of(context).pushNamed(verifyEmailRoute);
+              }
             },
             child: const Text('Register'),
           ),
