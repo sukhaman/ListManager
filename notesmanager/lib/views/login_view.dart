@@ -64,7 +64,8 @@ class _LoginViewState extends State<LoginView> {
                           final userCreditential = await FirebaseAuth.instance
                               .signInWithEmailAndPassword(
                                   email: email, password: password);
-                          print(userCreditential);
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/homeview/', (_) => false);
                         } on FirebaseAuthException catch (e) {
                           print(e.code);
                           final error = e.code;
