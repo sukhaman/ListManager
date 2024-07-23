@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:notesmanager/constans/routes.dart';
-import 'package:notesmanager/firebase_options.dart';
+import 'package:notesmanager/services/auth/auth_exceptions.dart';
+import 'package:notesmanager/services/auth/auth_service.dart';
+import 'package:notesmanager/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -32,7 +32,7 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Register')),
+      appBar: AppBar(title: const Text('Register')),
       body: Column(
         children: [
           TextField(
@@ -55,16 +55,28 @@ class _RegisterViewState extends State<RegisterView> {
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
-              await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                  email: email, password: password);
-              final user = FirebaseAuth.instance.currentUser;
-              await user?.sendEmailVerification();
-              if (user?.emailVerified ?? false) {
-                // Email is verified
-                Navigator.of(context).pushNamed(homeRoute);
-              } else {
-                // Email is not verified
-                Navigator.of(context).pushNamed(verifyEmailRoute);
+              try {
+                await AuthService.firebase()
+                    .createUser(email: email, password: password);
+
+                final user = AuthService.firebase().currentUser;
+                await AuthService.firebase().sendEmailVerification();
+                if (user?.isEmailVerified ?? false) {
+                  // Email is verified
+                  // ignore: use_build_context_synchronously
+                  Navigator.of(context).pushNamed(homeRoute);
+                } else {
+                  // Email is not verified
+                  Navigator.of(context).pushNamed(verifyEmailRoute);
+                }
+              } on WeakPasswordAuthException {
+                await showErrorDialog(context, 'Weak password');
+              } on EmailAlreadyInUseAuthException {
+                await showErrorDialog(context, 'Email is already in use');
+              } on InvalidEmailAuthException {
+                await showErrorDialog(context, 'Invalid email');
+              } on GenericAuthException {
+                await showErrorDialog(context, 'Failed to registered');
               }
             },
             child: const Text('Register'),
