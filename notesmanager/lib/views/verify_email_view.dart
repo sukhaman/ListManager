@@ -1,6 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notesmanager/constans/routes.dart';
+import 'package:notesmanager/services/auth/auth_exceptions.dart';
+import 'package:notesmanager/services/auth/auth_service.dart';
+import 'package:notesmanager/utilities/show_error_dialog.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({super.key});
@@ -14,7 +16,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Verify Email'),
+        title: const Text('Verify Email'),
       ),
       body: Column(
         children: [
@@ -24,17 +26,26 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               "If you haven't received a verificaiton email yet, press the button below"),
           TextButton(
               onPressed: () async {
-                final user = FirebaseAuth.instance.currentUser;
-                await user?.sendEmailVerification();
+                try {
+                  await AuthService.firebase().sendEmailVerification();
+                } on GenericAuthException {
+                  await showErrorDialog(context,
+                      'Unable to send verification email at the moment. Please try again later.');
+                }
               },
               child: const Text('Send email verification')),
           TextButton(
             onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                registerRoute,
-                (route) => false,
-              );
+              try {
+                await AuthService.firebase().logOut();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  registerRoute,
+                  (route) => false,
+                );
+              } on GenericAuthException {
+                await showErrorDialog(context,
+                    'Unable to send verification email at the moment. Please try again later.');
+              }
             },
             child: const Text('Restart'),
           )
