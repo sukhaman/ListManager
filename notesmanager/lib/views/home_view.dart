@@ -17,12 +17,11 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: const Text('Home'),
         actions: [
           PopupMenuButton<MenuAction>(onSelected: (value) async {
             switch (value) {
               case MenuAction.logout:
-                // TODO: Handle this case.
                 final shouldLogout = await showLogOutDialog(context);
                 if (shouldLogout) {
                   try {

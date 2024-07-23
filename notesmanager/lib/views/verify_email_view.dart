@@ -29,6 +29,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 try {
                   await AuthService.firebase().sendEmailVerification();
                 } on GenericAuthException {
+                  // ignore: use_build_context_synchronously
                   await showErrorDialog(context,
                       'Unable to send verification email at the moment. Please try again later.');
                 }
@@ -38,11 +39,13 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
             onPressed: () async {
               try {
                 await AuthService.firebase().logOut();
+                // ignore: use_build_context_synchronously
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   registerRoute,
                   (route) => false,
                 );
               } on GenericAuthException {
+                // ignore: use_build_context_synchronously
                 await showErrorDialog(context,
                     'Unable to send verification email at the moment. Please try again later.');
               }
