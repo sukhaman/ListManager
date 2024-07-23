@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:notesmanager/constans/routes.dart';
-import 'package:notesmanager/firebase_options.dart';
-import 'dart:developer' as devtools show log;
-
+import 'package:notesmanager/services/auth/auth_exceptions.dart';
+import 'package:notesmanager/services/auth/auth_service.dart';
 import 'package:notesmanager/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
@@ -37,8 +35,7 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: FutureBuilder(
-          future: Firebase.initializeApp(
-              options: DefaultFirebaseOptions.currentPlatform),
+          future: AuthService.firebase().initialize(),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
@@ -65,19 +62,26 @@ class _LoginViewState extends State<LoginView> {
                         final email = _email.text;
                         final password = _password.text;
                         try {
+                          await AuthService.firebase()
+                              .logIn(email: email, password: password);
                           // ignore: unused_local_variable
-                          final userCreditential = await FirebaseAuth.instance
-                              .signInWithEmailAndPassword(
-                                  email: email, password: password);
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              homeRoute, (route) => false);
-                        } on FirebaseAuthException catch (e) {
+                          final user = AuthService.firebase().currentUser;
+                          if (user?.isEmailVerified ?? false) {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              homeRoute,
+                              (route) => false,
+                            );
+                          } else {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              verifyEmailRoute,
+                              (route) => false,
+                            );
+                          }
+                        } on UserNotFoundAuthException {
+                          await showErrorDialog(context, 'Wrong credentails');
+                        } on GenericAuthException {
                           await showErrorDialog(
-                            // ignore: use_build_context_synchronously
-                            context,
-                            e.code,
-                          );
+                              context, 'Authenitication Error');
                         }
                       },
                       child: const Text('Login'),
