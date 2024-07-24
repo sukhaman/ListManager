@@ -3,6 +3,7 @@ import 'package:notesmanager/constans/routes.dart';
 import 'package:notesmanager/services/auth/auth_service.dart';
 import 'package:notesmanager/views/home_view.dart';
 import 'package:notesmanager/views/login_view.dart';
+import 'package:notesmanager/views/notes/add_note_view.dart';
 import 'package:notesmanager/views/register_view.dart';
 import 'views/verify_email_view.dart';
 
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         registerRoute: (context) => const RegisterView(),
         homeRoute: (context) => const HomeView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),
+        addNewNoteRoute: (context) => const AddNoteView(),
       },
     );
   }
