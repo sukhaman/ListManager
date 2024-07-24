@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:notesmanager/constans/routes.dart';
 import 'package:notesmanager/enums/menu_action.dart';
-import 'package:notesmanager/services/auth/auth_exceptions.dart';
 import 'package:notesmanager/services/auth/auth_service.dart';
 import 'package:notesmanager/services/crud/notes_service.dart';
-import 'package:notesmanager/utilities/show_error_dialog.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -38,18 +36,19 @@ class _HomeViewState extends State<HomeView> {
       appBar: AppBar(
         title: const Text('Home'),
         actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(addNewNoteRoute);
+              },
+              icon: const Icon(Icons.add)),
           PopupMenuButton<MenuAction>(onSelected: (value) async {
             switch (value) {
               case MenuAction.logout:
                 final shouldLogout = await showLogOutDialog(context);
                 if (shouldLogout) {
-                  try {
-                    await AuthService.firebase().logOut();
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(loginRoute, (_) => false);
-                  } on GenericAuthException {
-                    await showErrorDialog(context, 'Unable to log out');
-                  }
+                  await AuthService.firebase().logOut();
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil(loginRoute, (_) => false);
                 }
             }
           }, itemBuilder: (context) {
