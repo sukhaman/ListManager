@@ -4,14 +4,14 @@ import 'package:notesmanager/services/auth/auth_service.dart';
 import 'package:notesmanager/services/crud/notes_service.dart';
 import 'package:sqflite/sqflite.dart';
 
-class AddNoteView extends StatefulWidget {
-  const AddNoteView({super.key});
+class CreateUpdateNoteView extends StatefulWidget {
+  const CreateUpdateNoteView({super.key});
 
   @override
-  State<AddNoteView> createState() => _AddNoteViewState();
+  State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
 }
 
-class _AddNoteViewState extends State<AddNoteView> {
+class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   DatabaseNote? _note;
   late final NotesService _notesService;
   late final TextEditingController _textController;
