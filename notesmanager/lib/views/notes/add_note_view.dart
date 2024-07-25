@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notesmanager/services/auth/auth_exceptions.dart';
 import 'package:notesmanager/services/auth/auth_service.dart';
 import 'package:notesmanager/services/crud/notes_service.dart';
 import 'package:sqflite/sqflite.dart';
@@ -16,25 +17,29 @@ class _AddNoteViewState extends State<AddNoteView> {
   late final TextEditingController _textController;
 
   Future<DatabaseNote> createNewNote() async {
-    final exisitingNote = _note;
-    if (exisitingNote != null) {
-      return exisitingNote;
-    }
+    try {
+      final existingNote = _note;
+      if (existingNote != null) {
+        return existingNote;
+      }
 
-    final currentUser = AuthService.firebase().currentUser!;
-    final email = currentUser.email;
-    final owner = await _notesService.getUser(email: email);
-    return await _notesService.createNote(owner: owner);
-  }
+      final currentUser = AuthService.firebase().currentUser;
+      if (currentUser == null) {
+        throw UserNotFoundAuthException();
+      }
 
-  void _saveNote() async {
-    final note = _note;
-    final text = _textController.text;
-    if (note != null && text.isNotEmpty) {
-      await _notesService.updateNote(
-        note: note,
-        text: text,
-      );
+      final email = currentUser.email;
+      print('Creating note for user with email: $email');
+      final owner = await _notesService.getUser(email: email);
+      print('User found: $owner');
+
+      final newNote = await _notesService.createNote(owner: owner);
+      print('Note created: $newNote');
+      return newNote;
+    } catch (e, stackTrace) {
+      print('Error in creating new note: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
     }
   }
 
@@ -45,7 +50,7 @@ class _AddNoteViewState extends State<AddNoteView> {
     super.initState();
   }
 
-  void _textControllerListner() async {
+  void _textControllerListener() async {
     final note = _note;
     if (note == null) {
       return;
@@ -58,14 +63,33 @@ class _AddNoteViewState extends State<AddNoteView> {
     );
   }
 
+  void _deleteNoteIfTextIsEmpty() {
+    final note = _note;
+    if (_textController.text.isEmpty && note != null) {
+      _notesService.deleteNote(id: note.id);
+    }
+  }
+
+  void _saveNoteIfTextNotEmpty() async {
+    final note = _note;
+    final text = _textController.text;
+    if (note != null && text.isNotEmpty) {
+      await _notesService.updateNote(
+        note: note,
+        text: text,
+      );
+    }
+  }
+
   void _setupTextControllerListener() {
-    _textController.removeListener(_textControllerListner);
-    _textController.addListener(_textControllerListner);
+    _textController.removeListener(_textControllerListener);
+    _textController.addListener(_textControllerListener);
   }
 
   @override
   void dispose() {
-    _saveNote();
+    _deleteNoteIfTextIsEmpty();
+    _saveNoteIfTextNotEmpty();
     _textController.dispose();
     super.dispose();
   }
@@ -76,21 +100,25 @@ class _AddNoteViewState extends State<AddNoteView> {
       appBar: AppBar(
         title: const Text('Add Note'),
       ),
-      body: FutureBuilder(
+      body: FutureBuilder<DatabaseNote>(
         future: createNewNote(),
         builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              //_note = snapshot.data as DatabaseNote;
-              // _setupTextControllerListener();
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              _note = snapshot.data;
+              _setupTextControllerListener();
               return TextField(
                 controller: _textController,
                 keyboardType: TextInputType.multiline,
-                maxLength: null,
-                decoration: InputDecoration(hintText: 'Start typing your note'),
+                maxLines: null,
+                decoration:
+                    const InputDecoration(hintText: 'Start typing your note'),
               );
-            default:
-              return const CircularProgressIndicator();
+            } else {
+              return const Text('Error creating note');
+            }
+          } else {
+            return const CircularProgressIndicator();
           }
         },
       ),
