@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notesmanager/services/auth/auth_exceptions.dart';
 import 'package:notesmanager/services/auth/auth_service.dart';
 import 'package:notesmanager/services/crud/notes_service.dart';
+import 'package:notesmanager/utilities/generics/get_arguments.dart';
 import 'package:sqflite/sqflite.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {
@@ -16,31 +17,29 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   late final NotesService _notesService;
   late final TextEditingController _textController;
 
-  Future<DatabaseNote> createNewNote() async {
-    try {
-      final existingNote = _note;
-      if (existingNote != null) {
-        return existingNote;
-      }
-
-      final currentUser = AuthService.firebase().currentUser;
-      if (currentUser == null) {
-        throw UserNotFoundAuthException();
-      }
-
-      final email = currentUser.email;
-      print('Creating note for user with email: $email');
-      final owner = await _notesService.getUser(email: email);
-      print('User found: $owner');
-
-      final newNote = await _notesService.createNote(owner: owner);
-      print('Note created: $newNote');
-      return newNote;
-    } catch (e, stackTrace) {
-      print('Error in creating new note: $e');
-      print('Stack trace: $stackTrace');
-      rethrow;
+  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
+    final widgetNote = context.getArgument<DatabaseNote>();
+    if (widgetNote != null) {
+      _note = widgetNote;
+      _textController.text = widgetNote.text;
+      return widgetNote;
     }
+    final existingNote = _note;
+    if (existingNote != null) {
+      return existingNote;
+    }
+
+    final currentUser = AuthService.firebase().currentUser;
+    if (currentUser == null) {
+      throw UserNotFoundAuthException();
+    }
+
+    final email = currentUser.email;
+    final owner = await _notesService.getUser(email: email);
+
+    final newNote = await _notesService.createOrGetExisitingNote(owner: owner);
+    _note = newNote;
+    return newNote;
   }
 
   @override
@@ -101,11 +100,10 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         title: const Text('Add Note'),
       ),
       body: FutureBuilder<DatabaseNote>(
-        future: createNewNote(),
+        future: createOrGetExistingNote(context),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              _note = snapshot.data;
               _setupTextControllerListener();
               return TextField(
                 controller: _textController,
