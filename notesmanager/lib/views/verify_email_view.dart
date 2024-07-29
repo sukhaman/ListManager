@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notesmanager/constans/routes.dart';
 import 'package:notesmanager/services/auth/auth_exceptions.dart';
 import 'package:notesmanager/services/auth/auth_service.dart';
+import 'package:notesmanager/services/auth/bloc/auth_bloc.dart';
+import 'package:notesmanager/services/auth/bloc/auth_event.dart';
 import 'package:notesmanager/utilities/dialogs/error_dialog.dart';
 
 class VerifyEmailView extends StatefulWidget {
@@ -26,29 +29,16 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               "If you haven't received a verificaiton email yet, press the button below"),
           TextButton(
               onPressed: () async {
-                try {
-                  await AuthService.firebase().sendEmailVerification();
-                } on GenericAuthException {
-                  // ignore: use_build_context_synchronously
-                  await showErrorDialog(context,
-                      'Unable to send verification email at the moment. Please try again later.');
-                }
+                context.read<AuthBloc>().add(
+                      const AuthEventSendEmailVerificaiton(),
+                    );
               },
               child: const Text('Send email verification')),
           TextButton(
             onPressed: () async {
-              try {
-                await AuthService.firebase().logOut();
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  registerRoute,
-                  (route) => false,
-                );
-              } on GenericAuthException {
-                // ignore: use_build_context_synchronously
-                await showErrorDialog(context,
-                    'Unable to send verification email at the moment. Please try again later.');
-              }
+              context.read<AuthBloc>().add(
+                    const AuthEventLogOut(),
+                  );
             },
             child: const Text('Restart'),
           )
