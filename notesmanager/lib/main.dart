@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notesmanager/constans/routes.dart';
-import 'package:notesmanager/services/auth/bloc/auth_State.dart';
+import 'package:notesmanager/services/auth/bloc/auth_state.dart';
 import 'package:notesmanager/services/auth/bloc/auth_bloc.dart';
 import 'package:notesmanager/services/auth/bloc/auth_event.dart';
 import 'package:notesmanager/services/auth/firebase_auth_provider.dart';
@@ -13,23 +13,15 @@ import 'views/verify_email_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  runApp(
+    MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: BlocProvider<AuthBloc>(
         create: (context) => AuthBloc(FirebaseAuthProvider()),
-        child: const MainView(),
+        child: const HomePage(),
       ),
       routes: {
         loginRoute: (context) => const LoginView(),
@@ -38,16 +30,16 @@ class MyApp extends StatelessWidget {
         verifyEmailRoute: (context) => const VerifyEmailView(),
         createUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
       },
-    );
-  }
+    ),
+  );
 }
 
-class MainView extends StatelessWidget {
-  const MainView({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    context.read<AuthBloc>().add(const AuthEventIntialize());
+    context.read<AuthBloc>().add(const AuthEventInitialize());
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is AuthStateLoggedIn) {
