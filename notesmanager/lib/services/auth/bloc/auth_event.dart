@@ -27,7 +27,13 @@ class AuthEventRegister extends AuthEvent {
 }
 
 class AuthEventShouldRegister extends AuthEvent {
-  const AuthEventShouldRegister();
+  final String? email;
+  const AuthEventShouldRegister({this.email});
+}
+
+class AuthEventForgotPassword extends AuthEvent {
+  final String? email;
+  const AuthEventForgotPassword({this.email});
 }
 
 class AuthEventLogOut extends AuthEvent {
