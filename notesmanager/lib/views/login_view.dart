@@ -97,10 +97,6 @@ class _LoginViewState extends State<LoginView> {
             TextButton(
               onPressed: () {
                 context.read<AuthBloc>().add(const AuthEventShouldRegister());
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  registerRoute,
-                  (route) => false,
-                );
               },
               child: const Text('Not registered yet? Register here!'),
             )
