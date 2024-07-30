@@ -38,6 +38,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             await showPasswordResetSentDialog(context);
           }
           if (state.exception != null) {
+            // ignore: use_build_context_synchronously
             await showErrorDialog(context, 'We could not process your request');
           }
         }
