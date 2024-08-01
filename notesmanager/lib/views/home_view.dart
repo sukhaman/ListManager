@@ -7,7 +7,6 @@ import 'package:notesmanager/services/auth/bloc/auth_bloc.dart';
 import 'package:notesmanager/services/auth/bloc/auth_event.dart';
 import 'package:notesmanager/services/cloud/cloud_note.dart';
 import 'package:notesmanager/services/cloud/firebase_cloud_storage.dart';
-import 'package:notesmanager/services/crud/notes_service.dart';
 import 'package:notesmanager/utilities/dialogs/log_out_dialog.dart';
 import 'package:notesmanager/views/notes/notes_list_view.dart';
 
@@ -24,7 +23,6 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     _notesService = FirebaseCloudStorage();
     super.initState();
   }
@@ -82,7 +80,7 @@ class _HomeViewState extends State<HomeView> {
                     },
                   );
                 } else {
-                  return const CircularProgressIndicator();
+                  return const Scaffold();
                 }
               default:
                 return const CircularProgressIndicator();
