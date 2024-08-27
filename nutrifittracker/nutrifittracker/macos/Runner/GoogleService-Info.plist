@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDtG1RL_5OaCI1OkHB9F1weOnJWW0ylE_U</string>
+	<key>GCM_SENDER_ID</key>
+	<string>132095323619</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.decryptcode.workoutmaster</string>
+	<key>PROJECT_ID</key>
+	<string>workout-helper-7bda2</string>
+	<key>STORAGE_BUCKET</key>
+	<string>workout-helper-7bda2.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:132095323619:ios:81b9b610c9bc531a02c4d6</string>
+</dict>
+</plist>

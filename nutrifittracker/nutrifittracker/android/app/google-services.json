@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "132095323619",
+    "project_id": "workout-helper-7bda2",
+    "storage_bucket": "workout-helper-7bda2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132095323619:android:49179f46ba9292f802c4d6",
+        "android_client_info": {
+          "package_name": "com.decryptcode.workoutmaster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUJY8MRZSsy4NputBWST-99l_uGunlxZA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

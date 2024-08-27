@@ -1,125 +1,117 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nutrifittracker/bloc/auth_bloc.dart';
+import 'package:nutrifittracker/bloc/auth_event.dart';
+import 'package:nutrifittracker/bloc/firebase_auth_provider.dart';
+import 'package:nutrifittracker/bloc/auth_state.dart';
+import 'package:nutrifittracker/bloc/meal/meal_bloc.dart';
+import 'package:nutrifittracker/bloc/meal/meal_cloud_storge.dart';
+import 'package:nutrifittracker/bloc/userMeals/userMeals_bloc.dart';
+import 'package:nutrifittracker/bloc/userMeals/user_meal_cloud_storage.dart';
+import 'package:nutrifittracker/body/bloc/body_bloc.dart';
+import 'package:nutrifittracker/body/bloc/body_cloud_storage.dart';
+import 'package:nutrifittracker/body/views/body_view.dart';
+import 'package:nutrifittracker/constants/routes.dart';
+import 'package:nutrifittracker/views/activity_track_view.dart';
+import 'package:nutrifittracker/views/category_view.dart';
+import 'package:nutrifittracker/views/define_goal_view.dart';
+import 'package:nutrifittracker/views/login/login_view.dart';
+import 'package:nutrifittracker/views/nutrition/meal_entry_view.dart';
+import 'package:nutrifittracker/views/nutrition_detail_view.dart';
+import 'package:nutrifittracker/views/nutrition_track_view.dart';
+import 'package:nutrifittracker/views/personal_health_info_view.dart';
+import 'package:nutrifittracker/views/profile_view.dart';
+import 'package:nutrifittracker/views/settings/profile_settings_view.dart';
+import 'package:nutrifittracker/views/signup/gender_question_view.dart';
+import 'package:nutrifittracker/views/signup/signup_view.dart';
+import 'package:nutrifittracker/views/tab_bar.dart';
+import 'package:nutrifittracker/views/workout_history_view.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  await dotenv.load();
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(
+            FirebaseAuthProvider(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => MealBloc(
+            mealCloudStorage: MealCloudStorge(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => UserMealsBloc(
+            UserMealCloudStorage(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => BodyBloc(
+            BodyCloudStorage(),
+          ),
+        ),
+
+        // Add other providers here if needed
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      home: const ProviderScope(child: HomePage()),
+      routes: {
+        loginRoute: (context) => const LoginView(),
+        signupRoute: (context) => const GenderQuestionView(),
+        categoryRoute: (context) => const CategoryView(),
+        defineExerciseGoalRoute: (context) => const DefineGoalView(),
+        personalHealthInfoRoute: (context) => const PersonalHealthInfoView(),
+        userProfileRpute: (context) => const ProfileView(),
+        mainRoute: (context) => const MainScreen(),
+        workoutHistoryRoute: (context) => const WorkoutHistoryView(),
+        activityTrackingRoute: (context) => ActivityListView(),
+        nutritionTrackRoute: (context) => const NutritionTrackView(),
+        nutritionDetailRoute: (context) => const NutritionDetailView(),
+        profileSetttingsRoute: (context) => const ProfileSettingsView(),
+        addNewMealRoute: (context) => const MealEntryView(),
+        myBodyRoute: (context) => const BodyView(),
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    context.read<AuthBloc>().add(const AuthEventInitialize());
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        if (state is AuthStateLoggedOut) {
+          return const LoginView();
+        } else if (state is AuthStateRegistering) {
+          return const SignupView();
+        } else if (state is AuthStateLoggedIn) {
+          return const MainScreen();
+        } else {
+          return const Scaffold(
+            body: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 }
